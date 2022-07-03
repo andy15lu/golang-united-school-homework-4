@@ -2,6 +2,9 @@ package string_sum
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"unicode"
 )
 
 //use these errors as appropriate, wrapping them with fmt.Errorf function
@@ -23,5 +26,53 @@ var (
 // Use the errors defined above as described, again wrapping into fmt.Errorf
 
 func StringSum(input string) (output string, err error) {
-	return "", nil
+
+	if len(input) == 0 {
+		return "", fmt.Errorf(errorEmptyInput.Error(), input)
+	}
+	/*var parts []string = strings.Split(input, "+")
+	if len(parts) < 2 {
+		parts []string = strings.Split(input, "-")
+	}*/
+	//if len( parts) != 2 return "", Errorf()
+	var sum int = 0
+	var sign string = "+"
+	var currendDig string = "0"
+	var operandCount int = 0
+	var meetDigit bool = false
+	for i := 0; i < len(input); i++ {
+		if input[i] == '-' || input[i] == '+' {
+			var val, _ = strconv.Atoi(sign + currendDig)
+			sum += val
+			currendDig = "0"
+			sign = string(input[i])
+
+			if meetDigit {
+				operandCount++
+			}
+			meetDigit = false
+		} else if unicode.IsDigit(rune(input[i])) {
+			meetDigit = true
+			currendDig += string(input[i])
+		} else if input[i] != byte(' ') {
+			_, err = strconv.Atoi(string(input[i]))
+			return "", fmt.Errorf(err.Error(), input)
+		}
+	}
+	if meetDigit {
+		operandCount++
+	}
+	//fmt.Println(operandCount)
+	if operandCount != 2 {
+		return "", fmt.Errorf(errorNotTwoOperands.Error(), input)
+	}
+	var val, _ = strconv.Atoi(sign + currendDig)
+	sum += val
+	output = strconv.Itoa(sum)
+	/*	a, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+		b, err := strconv.Atoi(strings.TrimSpace(parts[1]))
+	*/
+	//output = strconv.Itoa(a + b)
+	return output, nil
+
 }
